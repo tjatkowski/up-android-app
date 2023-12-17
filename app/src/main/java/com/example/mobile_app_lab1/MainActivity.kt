@@ -148,15 +148,25 @@ fun TileList(characters: List<Character>) {
 }
 
 @Composable
+fun ErrorView() {
+    Text(text = "Error occurred!", color = Color.Red, fontSize = 23.sp, fontFamily = FontFamily(Font(R.font.main_font)))
+}
+
+@Composable
+fun LoadingView() {
+    Text(text = "Loading characters", color = Color.White, fontSize = 23.sp, fontFamily = FontFamily(Font(R.font.main_font)))
+}
+
+@Composable
 fun MainView(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val uiState by viewModel.immutableHpData.observeAsState(UiState())
 
     when {
         uiState.isLoading -> {
-
+            LoadingView()
         }
         uiState.error != null -> {
-
+            ErrorView()
         }
         uiState.data != null -> {
             uiState.data?.let { TileList(characters = it) }
