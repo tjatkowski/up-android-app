@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobile_app_lab1.repository.viewModel.MainViewModel
+import com.example.mobile_app_lab1.repository.model.Character
 import com.example.mobile_app_lab1.ui.theme.Mobileapplab1Theme
 import java.util.Vector
 import androidx.lifecycle.LiveData
@@ -47,8 +48,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color(0xFF2E2E2E)
                 ) {
-                    TileList(viewModel)
-//                    Tile(name = "Harry Potter")
+                    MainView(viewModel)
                 }
             }
         }
@@ -134,7 +134,21 @@ fun Tile(name: String, house: House) {
 }
 
 @Composable
-fun TileList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun TileList(characters: List<Character>) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(horizontal = 10.dp)
+    ) {
+        items(characters) { character ->
+            Tile(name = character.name, houseFromString(character.house))
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+    Log.d("Characters size", "Size: ${characters.size}")
+}
+
+@Composable
+fun MainView(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val uiState by viewModel.immutableHpData.observeAsState(UiState())
 
     when {
@@ -145,39 +159,9 @@ fun TileList(viewModel: MainViewModel, modifier: Modifier = Modifier) {
 
         }
         uiState.data != null -> {
-            uiState.data?.let {
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(horizontal = 10.dp)
-                ) {
-                    items(it) { character ->
-                        Tile(name = character.name, houseFromString(character.house))
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                }
-            }
-
+            uiState.data?.let { TileList(characters = it) }
         }
     }
-
-    Log.d("Characters size", "Size: ${characters.size}")
-
-
-//    Column(modifier = Modifier.padding(10.dp)) {
-//        Tile(name = "Harry Potter", House.gryffindor)
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Tile(name = "Ron Weasley", House.gryffindor)
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Tile(name = "Draco Malfoy", House.slytherin)
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Tile(name = "Cedric Diggory", House.hufflepuff)
-//        Spacer(modifier = Modifier.height(16.dp))
-//
-//        Tile(name = "Luna Lovegood", House.ravenclaw)
-//    }
 }
 
 
