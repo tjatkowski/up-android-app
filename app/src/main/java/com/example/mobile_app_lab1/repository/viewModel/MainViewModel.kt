@@ -21,7 +21,7 @@ class MainViewModel : ViewModel() {
         mutableHpData.postValue(UiState(isLoading = true))
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val request = hpRepository.getHPResponse()
+                val request = hpRepository.getCharactersListResponse()
                 Log.d("MainViewModel", "request code ${request.code()}")
                 if(request.isSuccessful) {
                     val characters = request.body()
@@ -36,5 +36,27 @@ class MainViewModel : ViewModel() {
                 Log.e("MainViewModel", "Operacja nie powiodla sie", e)
             }
         }
+    }
+
+    fun getCharacterDetails(characterId: String) {
+        mutableHpData.postValue(UiState(isLoading = true))
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = hpRepository.getCharacterDetailsResponse(characterId)
+                Log.d("MainViewModel", "request code ${request.code()} for $characterId")
+                if(request.isSuccessful) {
+                    val characters = request.body()
+                    mutableHpData.postValue(UiState(data = characters))
+                } else {
+                    mutableHpData.postValue(UiState(error = "Request error ${request.code()}"))
+
+                }
+
+            } catch (e: Exception) {
+                mutableHpData.postValue(UiState(error = "Exception $e"))
+                Log.e("MainViewModel", "Operacja nie powiodla sie", e)
+            }
+        }
+
     }
 }

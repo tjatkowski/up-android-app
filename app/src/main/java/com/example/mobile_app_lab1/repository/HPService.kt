@@ -5,11 +5,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Path
 
 interface HPService {
 
     @GET("/api/characters")
-    suspend fun getStarResponse(): Response<List<Character>>
+    suspend fun getCharactersList(): Response<List<Character>>
+
+    @GET("/api/character/{characterId}")
+    suspend fun getCharacterDetails(@Path("characterId") characterId: String): Response<List<Character>>
 
     companion object {
         private const val STAR_URL = "https://hp-api.onrender.com"

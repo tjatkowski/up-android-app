@@ -1,5 +1,6 @@
 package com.example.mobile_app_lab1
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -7,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -48,10 +50,16 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = Color(0xFF2E2E2E)
                 ) {
-                    MainView(viewModel)
+                    MainView(viewModel, onClick = { characterId: String -> navigateToDetails(characterId) })
                 }
             }
         }
+    }
+
+    private fun navigateToDetails(characterId: String) {
+        val intent = Intent(this, DetailsActivity::class.java)
+        intent.putExtra("characterId", characterId)
+        startActivity(intent)
     }
 }
 
@@ -109,7 +117,7 @@ fun houseFromString(house: String): House {
 }
 
 @Composable
-fun Tile(name: String, house: House) {
+fun Tile(name: String, house: House, onClick: () -> Unit) {
     val (houseMainColor, houseSecondColor) = getHouseColors(house)
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -120,6 +128,7 @@ fun Tile(name: String, house: House) {
 //            .width(300.dp)
             .fillMaxWidth()
             .height(50.dp)
+            .clickable { onClick.invoke() }
     ) {
         Image(
             painter = painterResource(id = houseImage(house)),
@@ -134,13 +143,13 @@ fun Tile(name: String, house: House) {
 }
 
 @Composable
-fun TileList(characters: List<Character>) {
+fun TileList(characters: List<Character>, onClick: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 10.dp)
     ) {
         items(characters) { character ->
-            Tile(name = character.name, houseFromString(character.house))
+            Tile(name = character.name, house = houseFromString(character.house), onClick = { onClick.invoke(character.id) })
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -158,7 +167,7 @@ fun LoadingView() {
 }
 
 @Composable
-fun MainView(viewModel: MainViewModel, modifier: Modifier = Modifier) {
+fun MainView(viewModel: MainViewModel, modifier: Modifier = Modifier, onClick: (String) -> Unit) {
     val uiState by viewModel.immutableHpData.observeAsState(UiState())
 
     when {
@@ -169,7 +178,7 @@ fun MainView(viewModel: MainViewModel, modifier: Modifier = Modifier) {
             ErrorView()
         }
         uiState.data != null -> {
-            uiState.data?.let { TileList(characters = it) }
+            uiState.data?.let { TileList(characters = it, onClick = onClick) }
         }
     }
 }
